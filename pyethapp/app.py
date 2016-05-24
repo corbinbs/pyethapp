@@ -104,8 +104,6 @@ def app(ctx, profile, alt_config, config_values, alt_data_dir, log_config, boots
 
     config['data_dir'] = data_dir
 
-    log.debug('initial eth.genesis: {0}'.format(config.get('eth', {}).get('genesis')))
-
     # Store custom genesis to restore if overridden by profile value
     genesis_from_config_file = config.get('eth', {}).get('genesis')
 
@@ -124,7 +122,6 @@ def app(ctx, profile, alt_config, config_values, alt_data_dir, log_config, boots
         # Fixed genesis_hash taken from profile must be deleted as custom genesis loaded
         del config['eth']['genesis_hash']
         config['eth']['genesis'] = genesis_from_config_file
-        log.debug('eth.genesis after defaults: {0}'.format(config.get('eth', {}).get('genesis')))
 
     if bootstrap_nodes_from_config_file:
         # Fixed bootstrap_nodes taken from profile must be deleted as custom bootstrap_nodes loaded
@@ -132,6 +129,9 @@ def app(ctx, profile, alt_config, config_values, alt_data_dir, log_config, boots
         config['discovery']['bootstrap_nodes'] = bootstrap_nodes_from_config_file
 
     pre_cmd_line_config_genesis = config.get('eth', {}).get('genesis')
+    log.debug('pre_cmd_line_config_genesis: {0}'.format(pre_cmd_line_config_genesis))
+
+    log.debug('config_values: {0}'.format(config_values))
     # override values with values from cmd line
     for config_value in config_values:
         try:
@@ -149,6 +149,8 @@ def app(ctx, profile, alt_config, config_values, alt_data_dir, log_config, boots
     # Load genesis config
     konfig.update_config_from_genesis_json(config,
                                            genesis_json_filename_or_dict=config['eth']['genesis'])
+
+    log.debug('config eth.genesis after update from JSON: {0}'.format(config['eth']['genesis']))
 
     log.debug('eth.genesis after loading: {0}'.format(config.get('eth', {}).get('genesis')))
     if bootstrap_node:
